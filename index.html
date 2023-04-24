@@ -315,6 +315,9 @@
         font-size: 1.5rem;
         margin-left: auto;
         display: block;
+      }
+
+      .modal button:not(#share-button) {
         background: white;
         border: 2px solid #000;
         color: #000;
@@ -322,11 +325,22 @@
         transition: border-radius 300ms ease-in-out;
       }
 
+      #share-button {
+        background-color: transparent;
+        border: 0;
+        cursor: pointer;
+        transition: transform 333ms ease-in-out;
+      }
+
+      #share-button:hover {
+        transform: scale(1.2);
+      }
+
       .modal button[value="sound-on"] {
         margin-left: 16px;
       }
 
-      .modal button:hover {
+      .modal button:not(#share-button):hover {
         background-color: #e3e3e3;
         border-radius: 15px;
       }
@@ -694,7 +708,7 @@
 
     <dialog class="modal" data-step="5">
       <form method="dialog">
-        <p>This one was not easy, I'm surprise you found the solution!</p>
+        <p>This one was not easy, I'm surprised you found the solution!</p>
         <blockquote>
           <b>#5</b><br />
           I am not comfortable when I'm next to the twins.
@@ -887,6 +901,14 @@
             </tr>
           </tbody>
         </table>
+        <button
+          type="button"
+          id="share-button"
+          title="Share on Twitter"
+          aria-label="Share on Twitter"
+        >
+          <img src="./icons/twitter.svg" alt="" class="icon" />
+        </button>
         <p>
           Now, you can enjoy a very nice clock.<br />
           Or you can replay if you feel so.<br />
@@ -1345,6 +1367,7 @@
           localStorage.removeItem("timenigma-used-hints");
           localStorage.removeItem("timenigma-fails");
           localStorage.removeItem("timenigma-started-game-at");
+          localStorage.removeItem("timenigma-playtime");
           window.location.reload();
         };
 
@@ -1389,12 +1412,47 @@
           return hours + ":" + minutes + ":" + seconds;
         }
 
-        function endGame() {
+        function getGameStats() {
           const failures = localStorage.getItem("timenigma-fails") || 0;
           const usedHints = getStoredUsedHints().length;
-          const startedTime =
-            Number(localStorage.getItem("timenigma-started-game-at")) || 0;
-          const playTime = msToTime(Date.now() - startedTime);
+
+          let playTime = localStorage.getItem("timenigma-playtime") || null;
+
+          if (!playTime) {
+            const startedTime =
+              Number(localStorage.getItem("timenigma-started-game-at")) || 0;
+            playTime = msToTime(Date.now() - startedTime);
+
+            localStorage.setItem("timenigma-playtime", playTime);
+          }
+
+          return { failures, usedHints, playTime };
+        }
+
+        document.getElementById("share-button").onclick = function () {
+          const rootTwitterURL = "https://twitter.com/intent/tweet";
+
+          const { failures, usedHints, playTime } = getGameStats();
+
+          const tweetContent = `I've beaten #TimEnigma ⏰🕵️‍♂️
+
+  ❌ Failed answers: ${failures}
+  💡 Used hints: ${usedHints}
+  ⏲️ Total playtime: ${playTime}
+
+Can you do better than me?
+
+➡️ https://adrien-gueret.itch.io/timenigma ⬅️`;
+
+          const twitterURL = `${rootTwitterURL}?text=${encodeURIComponent(
+            tweetContent
+          )}`;
+
+          window.open(twitterURL);
+        };
+
+        function endGame() {
+          const { failures, usedHints, playTime } = getGameStats();
 
           document
             .getElementById("end-failed-answers")
