@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="TimEnigma" />
+    <meta name="mobile-web-app-title" content="TimEnigma" />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="./icons/152.png"
+      type="image/png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="167x167"
+      href="./icons/167.png"
+      type="image/png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./icons/180.png"
+      type="image/png"
+    />
+
+    <link
+      rel="touch-icon"
+      sizes="152x152"
+      href="./icons/152.png"
+      type="image/png"
+    />
+    <link
+      rel="touch-icon"
+      sizes="167x167"
+      href="./icons/167.png"
+      type="image/png"
+    />
+    <link
+      rel="touch-icon"
+      sizes="180x180"
+      href="./icons/180.png"
+      type="image/png"
+    />
+
+    <link rel="icon" type="image/png" href="./icons/180.png" />
+
+    <title>TimEnigma</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Condensed"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-early-morning: url(./backgrounds/01-Early-Morning.png);
+        --bg-mid-morning: url(./backgrounds/02-Mid-Morning.png);
+        --bg-late-morning: url(./backgrounds/03-Late-Morning.png);
+        --bg-early-afternoon: url(./backgrounds/04-Early-Afternoon.png);
+        --bg-mid-afternoon: url(./backgrounds/05-Mid-Afternoon.png);
+        --bg-late-afternoon: url(./backgrounds/06-Late-Afternoon.png);
+        --bg-early-evening: url(./backgrounds/07-Early-Evening.png);
+        --bg-mid-evening: url(./backgrounds/08-Mid-Evening.png);
+        --bg-late-evening: url(./backgrounds/09-Late-Evening.png);
+        --bg-early-night: url(./backgrounds/10-Early-Night.png);
+        --bg-mid-night: url(./backgrounds/11-Mid-Night.png);
+        --bg-late-night: url(./backgrounds/12-Late-Night.png);
+
+        --current-bg: var(--bg-early-afternoon);
+
+        font-size: 16px;
+      }
+
+      @media (max-width: 400px) {
+        :root {
+          font-size: 12px;
+        }
+      }
+
+      @media (max-width: 300px) {
+        :root {
+          font-size: 10px;
+        }
+      }
+
+      body::after {
+        /* Preload backgrounds */
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        z-index: -1;
+        content: "";
+        background-image: var(--bg-early-morning), var(--bg-mid-morning),
+          var(--bg-late-morning), var(--bg-early-afternoon),
+          var(--bg-mid-afternoon), var(--bg-late-afternoon),
+          var(--bg-early-evening), var(--bg-mid-evening), var(--bg-late-evening),
+          var(--bg-early-night), var(--bg-mid-night), var(--bg-late-night);
+      }
+
+      body {
+        padding: 0;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: transparent;
+        background-position: center;
+        background-image: var(--current-bg);
+      }
+
+      body::before {
+        position: absolute;
+        z-index: 1;
+        content: "";
+        background-size: cover;
+        background-color: transparent;
+        background-position: center;
+        background-image: var(--current-bg);
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        pointer-events: none;
+        display: none;
+      }
+
+      #clock,
+      [data-type="hours"],
+      [data-type="minutes"],
+      [data-type="seconds"] {
+        font-family: "Roboto Condensed", sans-serif;
+        font-size: 10rem;
+        font-weight: bold;
+        padding: 16px;
+        border-radius: 20px;
+        cursor: default;
+      }
+
+      #clock.failure {
+        animation: shake 0.25s linear infinite;
+        pointer-events: none;
+      }
+
+      body[data-click-needed="clock"] #clock,
+      body[data-click-needed="hms"] #clock [data-type] {
+        background-color: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+      }
+
+      body.end-game #clock {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      body[data-click-needed="clock"] #clock [data-type] {
+        pointer-events: none;
+      }
+
+      body[data-click-needed="clock"] #clock:hover,
+      body[data-click-needed="hms"] #clock [data-type]:hover {
+        background-color: white;
+      }
+
+      #clock-container {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .separator {
+        pointer-events: none;
+        margin: -32px;
+      }
+
+      #time-travel-container {
+        position: relative;
+        top: 8px;
+      }
+
+      #time-travel {
+        width: 100%;
+      }
+
+      #time-icon-container {
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: calc(100% - 20px);
+      }
+
+      #time-icon {
+        --x: 0%;
+        position: absolute;
+        top: 0;
+        left: var(--x);
+        padding: 2px;
+        width: 18px;
+        background-color: #fff;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .buttons {
+        position: fixed;
+        top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      .buttons.right {
+        right: 16px;
+      }
+
+      .buttons.left {
+        left: 16px;
+      }
+
+      .buttons button {
+        background: transparent;
+        border: 0;
+        padding: 0;
+        height: 80px;
+        width: 80px;
+        cursor: pointer;
+        border-radius: 25%;
+        opacity: 0.4;
+        transition: opacity 200ms;
+        color: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .buttons button.active {
+        opacity: 1;
+        cursor: default;
+      }
+
+      .buttons button:hover,
+      .buttons button.active {
+        background-color: rgba(255, 255, 255, 0.8);
+        opacity: 1;
+      }
+
+      .buttons button::after {
+        content: attr(title);
+        position: relative;
+        top: 2px;
+        border-radius: 10px;
+        padding: 2px 4px;
+        white-space: nowrap;
+      }
+
+      .buttons button:hover::after,
+      .buttons button.active::after {
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+
+      #time-speed img,
+      #enable-sound,
+      #disable-sound,
+      #replay {
+        display: none;
+      }
+
+      #time-speed[title="Time speed x1"] img[alt="Time speed x1"],
+      #time-speed[title="Time speed x4"] img[alt="Time speed x4"],
+      #time-speed[title="Time speed x10"] img[alt="Time speed x10"],
+      #time-speed[title="Time speed x60"] img[alt="Time speed x60"],
+      [data-sound="on"] #disable-sound,
+      [data-sound="off"] #enable-sound,
+      .end-game #replay {
+        display: initial;
+      }
+
+      .icon {
+        width: 100%;
+      }
+
+      .modal {
+        font-family: "Arial", sans-serif;
+        z-index: 999;
+        font-size: 2rem;
+        border: 0;
+        border-radius: 30px;
+        transform: translateY(100vh);
+        transition: transform 1s ease-in-out;
+      }
+
+      .modal[open] {
+        animation: slideUp 1s;
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: forwards;
+      }
+
+      .modal p {
+        margin: 16px 0;
+      }
+
+      .modal::backdrop {
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+
+      .modal button {
+        font-size: 1.5rem;
+        margin-left: auto;
+        display: block;
+        background: white;
+        border: 2px solid #000;
+        color: #000;
+        padding: 8px 16px;
+        transition: border-radius 300ms ease-in-out;
+      }
+
+      .modal button[value="sound-on"] {
+        margin-left: 16px;
+      }
+
+      .modal button:hover {
+        background-color: #e3e3e3;
+        border-radius: 15px;
+      }
+
+      .modal button img {
+        width: 30px;
+        vertical-align: middle;
+      }
+
+      blockquote {
+        font-style: italic;
+        border-left: 5px solid #000;
+        padding-left: 7px;
+      }
+
+      .on-time-travel-enabled,
+      .on-time-speed-enabled {
+        display: none;
+      }
+
+      .time-travel-enabled .on-time-travel-enabled,
+      .time-speed-enabled .on-time-speed-enabled {
+        display: initial;
+      }
+
+      table {
+        width: 100%;
+        border: 1px solid #000;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        border: 1px solid #000;
+      }
+
+      th {
+        text-align: center;
+      }
+
+      td {
+        text-align: right;
+      }
+
+      .end-game #show-enigma-button,
+      .end-game #show-hint {
+        display: none;
+      }
+
+      @media screen and (max-width: 1000px) {
+        .buttons {
+          top: 8px;
+          justify-content: space-around;
+        }
+
+        .buttons.right {
+          left: 8px;
+          right: 8px;
+          flex-direction: row;
+        }
+
+        .buttons.left {
+          left: 8px;
+          right: 8px;
+          top: initial;
+          bottom: 30px;
+          flex-direction: row;
+        }
+
+        .buttons button {
+          height: 40px;
+          width: 40px;
+        }
+
+        .buttons.left button::after {
+          display: none;
+        }
+
+        .buttons.left button:hover::after,
+        .buttons.left button.active::after {
+          display: initial;
+        }
+
+        #clock,
+        [data-type="hours"],
+        [data-type="minutes"],
+        [data-type="seconds"] {
+          font-size: 5rem;
+          padding: 8px;
+        }
+
+        .separator {
+          margin: -16px;
+        }
+
+        .modal {
+          font: 1rem;
+        }
+
+        .modal button {
+          font-size: 0.75rem;
+        }
+
+        .modal button[value="sound-on"] {
+          margin-left: 8px;
+        }
+      }
+
+      @keyframes slideUp {
+        25% {
+          transform: translateY(100vh);
+        }
+
+        50% {
+          transform: translateY(-20px);
+        }
+
+        75% {
+          transform: translateY(10px);
+        }
+
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes shake {
+        0% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(5px);
+        }
+        50% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body data-sound="off">
+    <main id="clock-container">
+      <span id="clock">
+        <span data-type="hours"></span>
+        <span class="separator">:</span>
+        <span data-type="minutes"></span>
+        <span class="separator">:</span>
+        <span data-type="seconds"></span>
+      </span>
+
+      <div id="time-travel-container" class="on-time-travel-enabled">
+        <input id="time-travel" type="range" min="0" step="1" max="86399" />
+        <div id="time-icon-container">
+          <img id="time-icon" src="./icons/time.svg" alt="" class="icon" />
+        </div>
+      </div>
+
+      <div class="on-time-speed-enabled">
+        <aside class="buttons left">
+          <button
+            title="Time speed x0"
+            aria-label="Time speed x0"
+            data-time-speed="0"
+          >
+            <img src="./icons/sloth.svg" alt="" class="icon" />
+          </button>
+          <button
+            title="Time speed x1"
+            aria-label="Time speed x1"
+            data-time-speed="1"
+            class="active"
+          >
+            <img src="./icons/snail.svg" alt="" class="icon" />
+          </button>
+          <button
+            title="Time speed x4"
+            aria-label="Time speed x4"
+            data-time-speed="4"
+          >
+            <img src="./icons/rabbid.svg" alt="" class="icon" />
+          </button>
+          <button
+            title="Time speed x10"
+            aria-label="Time speed x10"
+            data-time-speed="10"
+          >
+            <img src="./icons/guepard.svg" alt="" class="icon" />
+          </button>
+          <button
+            title="Time speed x60"
+            aria-label="Time speed x60"
+            data-time-speed="60"
+          >
+            <img src="./icons/rocket.svg" alt="" class="icon" />
+          </button>
+        </aside>
+      </div>
+
+      <aside class="buttons right">
+        <button id="enable-sound" title="Audio off" aria-label="Enable audio">
+          <img src="./icons/sound-off.svg" alt="" class="icon" />
+        </button>
+        <button id="disable-sound" title="Audio on" aria-label="Disable audio">
+          <img src="./icons/sound-on.svg" alt="" class="icon" />
+        </button>
+        <button id="replay" title="Replay" aria-label="Replay">
+          <img src="./icons/replay.svg" alt="" class="icon" />
+        </button>
+        <button
+          id="show-enigma-button"
+          title="See enigma"
+          aria-label="See enigma"
+        >
+          <img src="./icons/show-enigma.svg" alt="" class="icon" />
+        </button>
+        <button id="show-hint" title="See hint" aria-label="See hint">
+          <img src="./icons/hint.svg" alt="See hint" class="icon" />
+        </button>
+      </aside>
+    </main>
+
+    <dialog class="modal" data-step="0">
+      <form method="dialog">
+        <p>Welcome to <strong>TimEnigma</strong>!</p>
+        <p>You are required to solve enigmas based on the current time.</p>
+        <p>
+          Some enigmas are about general culture: you may need to use Google to
+          find some answers!<br />
+          Don't worry, there is also a very helpfull hint for each enigma.
+        </p>
+        <p>Are you ready?</p>
+
+        <div style="display: flex">
+          <button value="sound-off">
+            <img src="./icons/sound-off.svg" alt="" class="icon" /> Play with
+            audio OFF
+          </button>
+          <button value="sound-on">
+            <img src="./icons/sound-on.svg" alt="" class="icon" /> Play with
+            audio ON
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="1">
+      <form method="dialog">
+        <p>
+          In order to progress, you only have to click on the correct element at
+          the correct time.<br />
+          <b>You will always have to click on something.</b>
+        </p>
+        <p>
+          When you close this modal, you'll see what time it was when you
+          launched this game.
+        </p>
+        <blockquote>
+          <b>#1</b><br />
+          The first "enigma" is very easy: just click on the minutes!
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="1">
+      <form method="dialog">
+        <p>
+          Do you see the timer in the middle of the page?<br />It shows what
+          time it was when you launched this game. The format is:
+        </p>
+        <p><b>hours</b>:<b>minutes</b>:<b>seconds</b></p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="2">
+      <form method="dialog">
+        <p>Yeah, you got it! It was easy, right?</p>
+        <p>Now, the clock is running, second per second...</p>
+        <blockquote>
+          <b>#2</b><br />
+          Here's your next mission: just wait 10 seconds, then click on the
+          clock.
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="2">
+      <form method="dialog">
+        <p>Just wait 10 seconds. And don't forget to click on the clock.</p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="3">
+      <form method="dialog">
+        <p>Waiting 10 seconds to win... That's what I call a game!</p>
+        <p>You know the basics, so let's start the real challenge!</p>
+        <p>
+          From now on, your next missions won't be that clear: you'll have to
+          guess what to do! Just read, analyze and understand the enigmas. Good
+          luck!
+        </p>
+        <blockquote>
+          <b>#3</b><br />
+          What is
+          <span>
+            <math>
+              <mrow>
+                <mi>7</mi>
+                <mo>+</mo>
+                <mi>5</mi>
+              </mrow>
+            </math>
+          </span>
+          ?
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="3">
+      <form method="dialog">
+        <p>
+          I'm sure you know how to solve
+          <span>
+            <math>
+              <mrow>
+                <mi>7</mi>
+                <mo>+</mo>
+                <mi>5</mi>
+              </mrow>
+            </math>
+          </span>
+          .
+        </p>
+        <p>Click on your answer when it appears on the screen!</p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="4">
+      <form method="dialog">
+        <p>You know how to solve additions!</p>
+        <p>As a reward, You can now control the speed of the clock!</p>
+        <blockquote><b>#4</b><br />I like stuttering numbers.</blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="4">
+      <form method="dialog">
+        <p>Cancan youyou countcount withwith meme??</p>
+        <p>11, 22, 33...</p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="5">
+      <form method="dialog">
+        <p>This one was not easy, I'm surprise you found the solution!</p>
+        <blockquote>
+          <b>#5</b><br />
+          I am not comfortable when I'm next to the twins.
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="5">
+      <form method="dialog">
+        <p><b>🧑‍🦰</b>:<b>👱‍♂️</b>:<b>👱‍♂️</b></p>
+        <p><b>👴</b>:<b>👵</b>:<b>👴</b></p>
+        <p><b>👩‍🦰</b>:<b>👩‍🦰</b>:<b>👱‍♀️</b></p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="6">
+      <form method="dialog">
+        <p>You've unlocked the time travel!</p>
+        <p>
+          You can now go to a specific time, so that you won't have to wait
+          hours and hours to solve enigmas.
+        </p>
+        <blockquote><b>#6</b><br />Travel 3 hours in the past!</blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="6">
+      <form method="dialog">
+        <p>Use the slider below the clock to travel throught time!</p>
+        <p>And don't forget to click on the clock when done :)</p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="7">
+      <form method="dialog">
+        <p>You understood how to time travel, well done.</p>
+        <p>Use this new power to solve next enigmas.</p>
+        <blockquote>
+          <b>#7</b><br />A terrible curse befell a beautiful princess, forcing
+          her to sleep for many years.
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="7">
+      <form method="dialog">
+        <p>
+          Do you know <em>Sleeping Beauty</em>? According to the tale, she was
+          forced to sleep for an entire century!
+        </p>
+        <p>That's... a lot of years!</p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="8">
+      <form method="dialog">
+        <blockquote>
+          <b>#8</b><br />
+          The Answer to the Ultimate Question of Life, The Universe, and
+          Everything.
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="8">
+      <form method="dialog">
+        <p>
+          <em>The Hitchhiker's Guide to the Galaxy</em> gives us this answer.
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="9">
+      <form method="dialog">
+        <p>Speaking about dogs...</p>
+        <blockquote>
+          <b>#9</b><br />
+          Did you know the first living being to go into space was a dog?
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="9">
+      <form method="dialog">
+        <p>
+          Laïka is a dog from the Soviet space program and the first living
+          being to orbit the Earth.
+        </p>
+        <p>
+          It was launched by the USSR aboard the Sputnik 2 spacecraft on
+          <span title="03/11/57">November 3, 1957</span>.
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="10">
+      <form method="dialog">
+        <p>Visiting space is fun, but time travel is funnier!</p>
+        <blockquote>
+          <b>#10</b><br />
+          A famous doctor travels between space and time since 1963... But do
+          you know at what time exactly did he start?
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="10">
+      <form method="dialog">
+        <p>This enigma is about <em>Doctor Who</em>.</p>
+        <p>
+          This serie first appeared on the BBC Television Service around 17:15!
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="11">
+      <form method="dialog">
+        <p>So you're a geek, hm? I guess you speak robot, right? 🤖</p>
+        <blockquote>
+          <b>#11</b><br />
+          01000011 01101100 01101001 01100011 01101011 00100000 01101111<br />
+          01101110 00100000 01100001 00100000 00110001 00110000 00101110
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="11">
+      <form method="dialog">
+        <p>This is binary.</p>
+        <p>
+          They're a lot of tools on Internet to convert binary into human
+          language.
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="12">
+      <form method="dialog">
+        <p>
+          Ok, you indeed speak robot. So I assume you are quite logical, right?
+        </p>
+        <blockquote>
+          <b>#12</b><br />
+          David is 4 times his daughter's age. In 20 years, he will be twice her
+          age. How old is David?
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="12">
+      <form method="dialog">
+        <p>
+          In 20 years, David's daughter will be three times her current age.
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-game-end>
+      <form method="dialog">
+        <p>You have solved all enigmas, you rock!</p>
+        <table>
+          <thead>
+            <tr>
+              <th>❌ Failed answers ❌</th>
+              <th>💡 Used hints 💡</th>
+              <th>⏲️ Total playtime ⏲️</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="end-failed-answers"></td>
+              <td id="end-used-hints"></td>
+              <td id="end-total-playtime"></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          Now, you can enjoy a very nice clock.<br />
+          Or you can replay if you feel so.<br />
+          Or you can even do crazy things like <i>going outside</i>, the choice
+          is your!
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <audio id="tick1">
+      <source src="./sounds/tick1.ogg" type="audio/ogg" />
+      <source src="./sounds/tick1.wav" type="audio/wav" />
+    </audio>
+
+    <audio id="tick2">
+      <source src="./sounds/tick2.ogg" type="audio/ogg" />
+      <source src="./sounds/tick2.wav" type="audio/wav" />
+    </audio>
+
+    <audio id="music" loop>
+      <source src="./sounds/music.ogg" type="audio/ogg" />
+      <source src="./sounds/music.wav" type="audio/wav" />
+    </audio>
+
+    <audio id="success">
+      <source src="./sounds/success.ogg" type="audio/ogg" />
+      <source src="./sounds/success.wav" type="audio/wav" />
+    </audio>
+
+    <audio id="failure">
+      <source src="./sounds/failure.ogg" type="audio/ogg" />
+      <source src="./sounds/failure.wav" type="audio/wav" />
+    </audio>
+
+    <script>
+      (function init() {
+        tick1.volume = 0.1;
+        tick2.volume = 0.1;
+        music.volume = 0.5;
+
+        function random(min, max) {
+          return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        function convertToMinutes(time) {
+          return time.hours * 60 + time.minutes;
+        }
+
+        const timeBreakpoints = {
+          "--bg-late-night": convertToMinutes({ hours: 2, minutes: 0 }),
+          "--bg-early-morning": convertToMinutes({ hours: 5, minutes: 0 }),
+          "--bg-mid-morning": convertToMinutes({ hours: 7, minutes: 0 }),
+          "--bg-late-morning": convertToMinutes({ hours: 10, minutes: 0 }),
+          "--bg-early-afternoon": convertToMinutes({ hours: 12, minutes: 0 }),
+          "--bg-mid-afternoon": convertToMinutes({ hours: 14, minutes: 0 }),
+          "--bg-late-afternoon": convertToMinutes({ hours: 17, minutes: 0 }),
+          "--bg-early-evening": convertToMinutes({ hours: 19, minutes: 0 }),
+          "--bg-mid-evening": convertToMinutes({ hours: 20, minutes: 0 }),
+          "--bg-late-evening": convertToMinutes({ hours: 21, minutes: 0 }),
+          "--bg-early-night": convertToMinutes({ hours: 22, minutes: 0 }),
+          "--bg-mid-night": convertToMinutes({ hours: 23, minutes: 59 }),
+        };
+
+        const lastTime = {};
+        let currentTimestamp = getSeconds(new Date());
+
+        const clockContainerElement =
+          document.getElementById("clock-container");
+        const clock = document.getElementById("clock");
+        const hoursNode = document.querySelector('[data-type="hours"]');
+        const minutesNode = document.querySelector('[data-type="minutes"]');
+        const secondsNode = document.querySelector('[data-type="seconds"]');
+        const timeTravel = document.getElementById("time-travel");
+        const timeIcon = document.getElementById("time-icon");
+
+        function padLeft(integer) {
+          if (integer < 10) {
+            return "0" + integer;
+          }
+
+          return "" + integer;
+        }
+
+        function updateBackground(hours, minutes) {
+          const currentMinutes = convertToMinutes({
+            hours: hours,
+            minutes: minutes,
+          });
+
+          const backgroundToRender = Object.keys(timeBreakpoints).reduce(
+            function (acc, background, index, array) {
+              const breakpointsMinutes = timeBreakpoints[background];
+
+              if (index === 0 && currentMinutes < breakpointsMinutes) {
+                return array[array.length - 1];
+              }
+
+              if (currentMinutes >= breakpointsMinutes) {
+                return background;
+              }
+
+              return acc;
+            },
+            null
+          );
+
+          document.body.style.setProperty(
+            "--current-bg",
+            "var(" + backgroundToRender + ")"
+          );
+        }
+
+        function getSeconds(date) {
+          return (
+            date.getSeconds() + date.getMinutes() * 60 + date.getHours() * 3600
+          );
+        }
+
+        function isSoundEnabled() {
+          return document.body.dataset.sound === "on";
+        }
+
+        function renderDate(timestamp) {
+          const date = new Date(timestamp * 1000 - 3600000);
+          const hours = date.getHours();
+          const minutes = date.getMinutes();
+          const seconds = date.getSeconds();
+
+          timeIcon.style.setProperty("--x", (timestamp * 100) / 86399 + "%");
+
+          hoursNode.innerHTML = padLeft(hours);
+          minutesNode.innerHTML = padLeft(minutes);
+          secondsNode.innerHTML = padLeft(seconds);
+
+          lastTime.seconds = seconds;
+
+          if (hours === lastTime.hours && minutes === lastTime.minutes) {
+            return;
+          }
+
+          lastTime.hours = hours;
+          lastTime.minutes = minutes;
+
+          updateBackground(hours, minutes);
+        }
+
+        timeTravel.addEventListener("input", () => {
+          currentTimestamp = timeTravel.value;
+          renderDate(currentTimestamp);
+        });
+
+        function setTimetravelValue(timestamp) {
+          currentTimestamp = timestamp > 86399 ? 0 : timestamp;
+          timeTravel.value = currentTimestamp;
+          renderDate(currentTimestamp);
+        }
+
+        setTimetravelValue(currentTimestamp);
+
+        let timeSpeed = 1;
+        let clockInterval = 0;
+
+        function startClock() {
+          setTimetravelValue(currentTimestamp);
+
+          if (clockInterval) {
+            window.clearInterval(clockInterval);
+          }
+
+          if (timeSpeed === 0) {
+            return;
+          }
+
+          clockInterval = window.setInterval(function () {
+            currentTimestamp++;
+
+            setTimetravelValue(currentTimestamp);
+
+            if (isSoundEnabled()) {
+              [tick1, tick2][random(0, 1)].play();
+            }
+          }, 1000 / timeSpeed);
+        }
+
+        function enableTimeTravel() {
+          document.body.classList.add("time-travel-enabled");
+        }
+
+        function enableTimeSpeed() {
+          document.body.classList.add("time-speed-enabled");
+        }
+
+        let currentStepIndex = localStorage.getItem("timenigma-index") || 0;
+        let currentDialog = null;
+
+        function attachSpecificClickStepEvent(callback, clickNeeded) {
+          function click(e) {
+            if (callback(e)) {
+              clock.removeEventListener("click", click);
+
+              if (isSoundEnabled()) {
+                success.play();
+              }
+
+              goToNextStep();
+            } else {
+              if (isSoundEnabled()) {
+                failure.play();
+              }
+
+              clock.classList.add("failure");
+
+              const totalFailures =
+                Number(localStorage.getItem("timenigma-fails")) || 0;
+              localStorage.setItem("timenigma-fails", totalFailures + 1);
+
+              window.setTimeout(() => {
+                clock.classList.remove("failure");
+              }, 500);
+            }
+          }
+          document.body.dataset.clickNeeded = clickNeeded;
+          clock.addEventListener("click", click);
+        }
+
+        const STEPS = [
+          // 0 - Welcome
+          () => {
+            document.querySelector('[data-step="0"]').onclose = (e) => {
+              if (e.target.returnValue === "sound-on") {
+                enableSound();
+              } else {
+                disableSound();
+              }
+
+              goToNextStep();
+            };
+          },
+          // 1 - Basics tuto
+          () =>
+            attachSpecificClickStepEvent(
+              (e) => e.target.dataset.type === "minutes",
+              "hms"
+            ),
+          // 2 - Waiting
+          () => {
+            document.querySelector('[data-step="2"]').addEventListener(
+              "close",
+              () => {
+                startClock();
+
+                let isOK = false;
+
+                window.setTimeout(() => {
+                  isOK = true;
+                }, 10000);
+
+                attachSpecificClickStepEvent(() => isOK, "clock");
+              },
+              { once: true }
+            );
+          },
+          // 3 - Addition
+          () =>
+            attachSpecificClickStepEvent(
+              (e) => e.target.innerHTML === "12",
+              "hms"
+            ),
+          // 4 - Stuttering
+          () => {
+            enableTimeSpeed();
+            attachSpecificClickStepEvent(
+              (e) => Number(e.target.innerHTML) % 11 === 0,
+              "hms"
+            );
+          },
+          // 5 - Twins
+          () =>
+            attachSpecificClickStepEvent((e) => {
+              switch (e.target.dataset.type) {
+                case "hours":
+                  return (
+                    lastTime.minutes === lastTime.seconds &&
+                    lastTime.hours !== lastTime.minutes
+                  );
+                  break;
+
+                case "minutes":
+                  return (
+                    lastTime.hours === lastTime.seconds &&
+                    lastTime.minutes !== lastTime.hours
+                  );
+                  break;
+
+                case "seconds":
+                  return (
+                    lastTime.hours === lastTime.minutes &&
+                    lastTime.seconds !== lastTime.hours
+                  );
+                  break;
+
+                default:
+                  return false;
+              }
+            }, "hms"),
+          // 6 - Time travel tuto
+          () => {
+            enableTimeTravel();
+
+            const now = new Date();
+            const currentHours = now.getHours();
+
+            setTimetravelValue(getSeconds(now));
+
+            let targetHours = currentHours - 3;
+
+            if (targetHours < 0) {
+              targetHours = 24 + targetHours;
+            }
+
+            attachSpecificClickStepEvent(
+              () => lastTime.hours === targetHours,
+              "clock"
+            );
+          },
+          // 7 - Sleeping Beauty
+          () =>
+            attachSpecificClickStepEvent(
+              () =>
+                lastTime.hours === 0 &&
+                lastTime.minutes === 1 &&
+                lastTime.seconds === 0,
+              "clock"
+            ),
+          // 8 - 42
+          () =>
+            attachSpecificClickStepEvent(
+              (e) => e.target.innerHTML === "42",
+              "hms"
+            ),
+          // 9 - Dog in space
+          () =>
+            attachSpecificClickStepEvent(
+              () =>
+                ((lastTime.hours === 3 && lastTime.minutes === 11) ||
+                  (lastTime.hours === 11 && lastTime.minutes === 3)) &&
+                lastTime.seconds === 57,
+              "clock"
+            ),
+          // 10 - Doctor Who
+          () =>
+            attachSpecificClickStepEvent(
+              () =>
+                lastTime.hours === 17 &&
+                (lastTime.minutes === 15 || lastTime.minutes === 16),
+              "clock"
+            ),
+          // 11 - Binary
+          () =>
+            attachSpecificClickStepEvent(
+              (e) => e.target.innerHTML === "10",
+              "hms"
+            ),
+          // 12 - David age
+          () =>
+            attachSpecificClickStepEvent(
+              (e) => e.target.innerHTML === "40",
+              "hms"
+            ),
+          // () => {},
+        ];
+
+        function showDialog(stepIndex) {
+          const dialog = document.querySelector(
+            `dialog[data-step="${stepIndex}"]`
+          );
+
+          if (currentDialog && currentDialog.open) {
+            currentDialog.close();
+          }
+
+          if (dialog) {
+            dialog.showModal();
+            currentDialog = dialog;
+          }
+        }
+
+        function showHint(stepIndex) {
+          const dialog = document.querySelector(
+            `dialog[data-hint-step="${stepIndex}"]`
+          );
+
+          if (currentDialog && currentDialog.open) {
+            currentDialog.close();
+          }
+
+          if (dialog) {
+            dialog.showModal();
+            currentDialog = dialog;
+          }
+        }
+
+        function getStoredUsedHints() {
+          const stringedUsedHints = localStorage.getItem(
+            "timenigma-used-hints"
+          );
+
+          if (!stringedUsedHints) {
+            return [];
+          }
+
+          try {
+            return JSON.parse(stringedUsedHints) || [];
+          } catch (e) {
+            return [];
+          }
+
+          if (!Array.isArray(usedHints)) {
+            return [];
+          }
+        }
+
+        [...document.querySelectorAll("dialog[data-hint-step]")].forEach(
+          (dialog) => {
+            dialog.addEventListener(
+              "close",
+              () => {
+                const usedHints = getStoredUsedHints();
+
+                if (usedHints.includes(dialog.dataset.hintStep)) {
+                  return;
+                }
+
+                usedHints.push(dialog.dataset.hintStep);
+                localStorage.setItem(
+                  "timenigma-used-hints",
+                  JSON.stringify(usedHints)
+                );
+              },
+              { once: true }
+            );
+          }
+        );
+
+        document.getElementById("show-enigma-button").onclick = () => {
+          showDialog(currentStepIndex);
+        };
+
+        document.getElementById("show-hint").onclick = () => {
+          showHint(currentStepIndex);
+        };
+
+        document.getElementById("replay").onclick = () => {
+          localStorage.removeItem("timenigma-index");
+          localStorage.removeItem("timenigma-used-hints");
+          localStorage.removeItem("timenigma-fails");
+          localStorage.removeItem("timenigma-started-game-at");
+          window.location.reload();
+        };
+
+        function enableSound() {
+          document.body.dataset.sound = "on";
+          music.play();
+        }
+
+        function disableSound() {
+          document.body.dataset.sound = "off";
+          music.pause();
+        }
+
+        document.getElementById("enable-sound").onclick = enableSound;
+        document.getElementById("disable-sound").onclick = disableSound;
+
+        const speedButtons = [
+          ...document.querySelectorAll("[data-time-speed]"),
+        ];
+
+        speedButtons.forEach((currentButton) => {
+          const buttonSpeed = Number(currentButton.dataset.timeSpeed);
+
+          currentButton.onclick = () => {
+            timeSpeed = buttonSpeed;
+
+            startClock();
+
+            speedButtons.forEach((speedButton) => {
+              speedButton.classList.remove("active");
+            });
+
+            currentButton.classList.add("active");
+          };
+        });
+
+        function msToTime(duration) {
+          const seconds = padLeft(Math.floor((duration / 1000) % 60));
+          const minutes = padLeft(Math.floor((duration / (1000 * 60)) % 60));
+          const hours = padLeft(Math.floor(duration / (1000 * 60 * 60)));
+
+          return hours + ":" + minutes + ":" + seconds;
+        }
+
+        function endGame() {
+          const failures = localStorage.getItem("timenigma-fails") || 0;
+          const usedHints = getStoredUsedHints().length;
+          const startedTime =
+            Number(localStorage.getItem("timenigma-started-game-at")) || 0;
+          const playTime = msToTime(Date.now() - startedTime);
+
+          document
+            .getElementById("end-failed-answers")
+            .appendChild(document.createTextNode(failures));
+
+          document
+            .getElementById("end-used-hints")
+            .appendChild(document.createTextNode(usedHints));
+
+          document
+            .getElementById("end-total-playtime")
+            .appendChild(document.createTextNode(playTime));
+
+          document.querySelector("dialog[data-game-end]").showModal();
+          delete document.body.dataset.clickNeeded;
+          document.body.className = "end-game";
+
+          setTimetravelValue(getSeconds(new Date()));
+        }
+
+        function goToStep(stepIndex) {
+          const nextStep = STEPS[stepIndex];
+
+          if (!nextStep) {
+            endGame();
+            return;
+          }
+
+          if (nextStep) {
+            nextStep();
+          }
+
+          showDialog(stepIndex);
+        }
+
+        function goToNextStep() {
+          currentStepIndex++;
+
+          if (currentStepIndex > 1) {
+            localStorage.setItem("timenigma-index", currentStepIndex);
+          }
+
+          goToStep(currentStepIndex);
+        }
+
+        if (currentStepIndex === 0) {
+          localStorage.setItem("timenigma-started-game-at", Date.now());
+        }
+
+        if (currentStepIndex > 2) {
+          startClock();
+        }
+
+        if (currentStepIndex >= 4) {
+          enableTimeSpeed();
+        }
+
+        if (currentStepIndex >= 6) {
+          enableTimeTravel();
+        }
+
+        goToStep(currentStepIndex);
+      })();
+    </script>
+  </body>
+</html>
+
+<!-- https://tallbeard.itch.io/music-loop-bundle -->
