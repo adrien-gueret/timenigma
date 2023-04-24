@@ -914,6 +914,32 @@
       </form>
     </dialog>
 
+    <dialog class="modal" data-step="14">
+      <form method="dialog">
+        <p>You seem to appreciate good music. Do you like paintings?</p>
+        <blockquote>
+          <b>#14</b><br />
+          Did you know that the most famous painting about time has been
+          inspired by a French cheese?
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="14">
+      <form method="dialog">
+        <p>
+          Melted watches are drawn in <em>The Persistence of Memory</em>, but
+          only one shows its two hands.
+        </p>
+        <p>
+          Since the watch is melted, we are not looking for precision here,
+          don't worry, you have a margin of ten minutes.
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
     <dialog class="modal" data-game-end>
       <form method="dialog">
         <p>You have solved all enigmas, you rock!</p>
@@ -1326,6 +1352,14 @@
               "clock"
             );
           },
+          // 14 - Salvador Dali
+          () =>
+            attachSpecificClickStepEvent(
+              () =>
+                (lastTime.hours === 6 || lastTime.hours === 18) &&
+                (lastTime.minutes >= 45 || lastTime.minutes <= 55),
+              "clock"
+            ),
         ];
 
         function showDialog(stepIndex) {
