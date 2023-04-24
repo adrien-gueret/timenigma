@@ -940,6 +940,41 @@
       </form>
     </dialog>
 
+    <dialog class="modal" data-step="15">
+      <form method="dialog">
+        <p>
+          You're good, very good!<br />This is already the last enigma, and
+          since you're playing a game... let's speak about one of the most
+          famous videogame about time travel!
+        </p>
+        <blockquote>
+          <b>#14</b><br />
+          The Hero of Time was too young to use the Master Sword, so his spirit
+          was sealed for several years.
+        </blockquote>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="15">
+      <form method="dialog">
+        <p>
+          You must have heard about
+          <em>The Legend of Zelda: Ocarina of Time</em>.<br />
+          Except if you really are a time traveler coming from another timeline,
+          of course.
+        </p>
+        <p>
+          So yeah, in <em>Ocarina of Time</em>, Link travels between two
+          periods: his child age and his adulthood.
+        </p>
+        <p>
+          No more hints on this one, this is the last enigma, so good luck :)
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
     <dialog class="modal" data-game-end>
       <form method="dialog">
         <p>You have solved all enigmas, you rock!</p>
@@ -1359,6 +1394,12 @@
                 (lastTime.hours === 6 || lastTime.hours === 18) &&
                 (lastTime.minutes >= 45 || lastTime.minutes <= 55),
               "clock"
+            ),
+          // 15 - Ocarina of Time
+          () =>
+            attachSpecificClickStepEvent(
+              (e) => e.target.innerHTML === "07",
+              "hms"
             ),
         ];
 
