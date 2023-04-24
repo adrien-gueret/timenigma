@@ -7,6 +7,13 @@ You are an inexperiment time traveler, but above all you are a detective!
 
 At the start of the game, you will be subject to time, but you will quickly learn to manipulate it to help you solve the puzzles!
 
+## Play
+
+You can play:
+
+- directly [on GitHub](https://adrien-gueret.github.io/timenigma/)
+- or [on itch.io](https://adrien-gueret.itch.io/timenigma)
+
 ## Credits
 
 Backgrounds are a creation of [Dany Care](https://bitday.me/#credits).
