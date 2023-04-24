@@ -751,8 +751,9 @@
         <p>You understood how to time travel, well done.</p>
         <p>Use this new power to solve next enigmas.</p>
         <blockquote>
-          <b>#7</b><br />A terrible curse befell a beautiful princess, forcing
-          her to sleep for many years.
+          <b>#7</b><br /><cite>Great Scott!</cite><br />
+          Now follow the steps of a famous doc and go to his very first
+          destination time.
         </blockquote>
         <button>Go!</button>
       </form>
@@ -760,17 +761,18 @@
 
     <dialog class="modal" data-hint-step="7">
       <form method="dialog">
+        <p>This is about <em>Back to the Future</em>.</p>
         <p>
-          Do you know <em>Sleeping Beauty</em>? According to the tale, she was
-          forced to sleep for an entire century!
+          You have to go to the exact same destination <b>time</b> than the
+          first travel of the DeLorean (don't mind the seconds).
         </p>
-        <p>That's... a lot of years!</p>
         <button>Ok!</button>
       </form>
     </dialog>
 
     <dialog class="modal" data-step="8">
       <form method="dialog">
+        <p>Let's continue with more Science-Fiction...</p>
         <blockquote>
           <b>#8</b><br />
           The Answer to the Ultimate Question of Life, The Universe, and
@@ -791,7 +793,7 @@
 
     <dialog class="modal" data-step="9">
       <form method="dialog">
-        <p>Speaking about dogs...</p>
+        <p>Enough with fiction, what about History stuff?</p>
         <blockquote>
           <b>#9</b><br />
           Did you know the first living being to go into space was a dog?
@@ -816,7 +818,10 @@
 
     <dialog class="modal" data-step="10">
       <form method="dialog">
-        <p>Visiting space is fun, but time travel is funnier!</p>
+        <p>
+          Visiting space is fun, but time travel is definitively funnier!<br />
+          Let's go back to Science-Fiction!
+        </p>
         <blockquote>
           <b>#10</b><br />
           A famous doctor travels between space and time since 1963... But do
@@ -877,6 +882,33 @@
       <form method="dialog">
         <p>
           In 20 years, David's daughter will be three times her current age.
+        </p>
+        <button>Ok!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-step="13">
+      <form method="dialog">
+        <p>Math is hard, right? How about some music to relax?</p>
+        <blockquote>
+          <b>#13</b><br />
+          <audio id="enigma-13" controls>
+            <source src="./sounds/13.ogg" type="audio/ogg" />
+            <source src="./sounds/13.wav" type="audio/wav" />
+          </audio>
+        </blockquote>
+        <p>
+          <b>Can't play the music?</b> The hint will let you guess what to do!
+        </p>
+        <button>Go!</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" data-hint-step="13">
+      <form method="dialog">
+        <p>
+          We're looking for a music released in 2014. It's part of some ghost
+          stories.
         </p>
         <button>Ok!</button>
       </form>
@@ -1235,16 +1267,13 @@
               "clock"
             );
           },
-          // 7 - Sleeping Beauty
+          // 7 - Back to the future
           () =>
             attachSpecificClickStepEvent(
-              () =>
-                lastTime.hours === 0 &&
-                lastTime.minutes === 1 &&
-                lastTime.seconds === 0,
+              () => lastTime.hours === 1 && lastTime.minutes === 21,
               "clock"
             ),
-          // 8 - 42
+          // 8 - Universal Answer
           () =>
             attachSpecificClickStepEvent(
               (e) => e.target.innerHTML === "42",
@@ -1279,7 +1308,24 @@
               (e) => e.target.innerHTML === "40",
               "hms"
             ),
-          // () => {},
+          // 13 - Music
+          () => {
+            document
+              .querySelector('[data-step="13"]')
+              .addEventListener("close", () => {
+                const music = document.getElementById("enigma-13");
+                music.pause();
+                music.currentTime = 0;
+              });
+
+            attachSpecificClickStepEvent(
+              () =>
+                lastTime.hours === 0 &&
+                lastTime.minutes === 0 &&
+                lastTime.seconds === 0,
+              "clock"
+            );
+          },
         ];
 
         function showDialog(stepIndex) {
