@@ -1331,7 +1331,9 @@
           // 7 - Back to the future
           () =>
             attachSpecificClickStepEvent(
-              () => lastTime.hours === 1 && lastTime.minutes === 21,
+              () =>
+                lastTime.hours === 1 &&
+                (lastTime.minutes === 20 || lastTime.minutes === 21),
               "clock"
             ),
           // 8 - Universal Answer
